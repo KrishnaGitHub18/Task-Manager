@@ -9,7 +9,6 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -62,7 +61,7 @@ export default function Home() {
           });
           console.log(res.data.userTasks);
           setTasksData(res.data.userTasks);
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error fetching data", error);
         }
       };
@@ -70,6 +69,16 @@ export default function Home() {
     }
   }, [name]);
 
+
+  const handleDelete = async (taskId: any) => {
+    axios.delete(`/api/users/delete/${taskId}`)
+      .then(response => {
+        console.log(response.data); // Output: { message: "Object with ID your_object_id_here deleted successfully" }
+      })
+      .catch(error => {
+        console.error(error); // Output: Error message if the request fails
+      });
+  }
 
 
   return (
@@ -124,34 +133,35 @@ export default function Home() {
           {tasksData.length > 0 ? (
             tasksData.map((task: any, index) => (
               <Card
-                className='text-white bg-zinc-700 w-[300px] max-h-[75%] p-4 rounded-lg shadow-lg hover:bg-zinc-600 transition duration-300 ease-in-out flex flex-col justify-around items-center'
+                className='border-none text-white bg-zinc-700 w-[300px] max-h-[75%] rounded-lg shadow-lg hover:bg-zinc-600 transition duration-300 ease-in-out flex flex-col justify-between'
                 key={index}
               >
                 <CardHeader>
-                  <CardTitle className='text-lg font-semibold'>{task.title}</CardTitle>
+                  <CardTitle className='text-xl font-semibold'>{task.title}</CardTitle>
                   <CardDescription className='text-sm text-gray-400'>
-                    {new Date(task.dueDate).toLocaleDateString('en-US')}
+                    DUE-DATE: {new Date(task.dueDate).toLocaleDateString('en-US')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className='text-gray-100'>{task.description}</p>
                 </CardContent>
-                <CardFooter className='flex justify-between items-center mt-4 space-x-8'>
-                  <Badge className={`text-sm py-1 px-2 rounded-md`}>
+                <CardFooter className='flex justify-between items-center mt-4'>
+                  <Badge className={`text-sm py-1 px-2 rounded-md`} style={{ backgroundColor: `${task.status === "Completed" ? "#28A745" : task.status === "In Progress" ? "#FFC107" : "#007BFF"}` }}>
                     {task.status}
                   </Badge>
-                  <div className='flex space-x-4'>
+                  <div className='flex space-x-4 ml-auto'>
                     <FontAwesomeIcon icon={faEdit} className='cursor-pointer text-yellow-400 hover:text-yellow-500' />
-                    <FontAwesomeIcon icon={faTrash} className='cursor-pointer text-red-400 hover:text-red-500' />
+                    <FontAwesomeIcon icon={faTrash} className='cursor-pointer text-red-400 hover:text-red-500' onClick={() => { handleDelete(task._id) }} />
                   </div>
                 </CardFooter>
               </Card>
+
             ))
           ) : ""}
 
           {/* Add New Task Card */}
           <Card
-            className='text-white bg-zinc-700 w-[300px] max-h-[75%] rounded-lg shadow-lg hover:bg-zinc-600 transition duration-300 ease-in-out flex justify-center items-center'
+            className='border-none text-white bg-zinc-700 w-[300px] max-h-[75%] min-h-[60%] rounded-lg shadow-lg hover:bg-zinc-600 transition duration-300 ease-in-out flex justify-center items-center'
             onClick={() => router.push("/newTask")}
           >
             <FontAwesomeIcon icon={faPlus} className='mr-4' />
@@ -167,18 +177,3 @@ export default function Home() {
     </main >
   );
 }
-
-{/* <Card className='text-white bg-zinc-700 '>
-        <CardHeader>
-          <CardTitle>Bonyo</CardTitle>
-          <CardDescription>Onik</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Card Content</p>
-        </CardContent>
-        <CardFooter>
-          <Badge>Badge</Badge>
-          <FontAwesomeIcon icon={faEdit} />
-          <FontAwesomeIcon icon={faTrash} />
-        </CardFooter>
-      </Card> */}

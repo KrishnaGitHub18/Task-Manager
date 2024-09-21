@@ -1,5 +1,6 @@
 import { cookiesData } from "@/helpers/cookiesData";
 import { NextRequest, NextResponse } from "next/server";
+import userModel from "@/app/models/userModel";
 import dbConnect from "@/lib/dbConnect";
 
 dbConnect();
